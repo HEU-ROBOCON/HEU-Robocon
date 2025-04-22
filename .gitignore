@@ -7,5 +7,6 @@ build/
 # 忽略 IDE 配置文件
 .vscode/
 .idea/
+folder-alias.json
 # 忽略系统文件
 .DS_Store
