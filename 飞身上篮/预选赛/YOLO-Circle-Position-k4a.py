@@ -93,7 +93,7 @@ if __name__ == "__main__":
                 
             # 获取彩色图像和深度图像
             color_image = capture.color
-            depth_image = capture.depth
+            depth_image = capture.transformed_depth
 
             # 将彩色图像从BGRA转为BGR格式
             color_image = cv2.cvtColor(color_image, cv2.COLOR_BGRA2BGR)

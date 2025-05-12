@@ -13,23 +13,32 @@ from ultralytics import YOLO
 
 model = YOLO('飞身上篮/预选赛/weights/yolo11n_cu_cir_2.pt') 
 
-depth_intrinsics = None
+# 新增对齐对象和彩色相机内参
+align_to = rs.stream.color
+align = rs.align(align_to)
+color_intrinsics = None  # 将使用对齐后的彩色相机内参
 
-def get_3d_coordinates(box, depth_frame):
+def get_3d_coordinates(box, depth_frame, intrinsics):
     """获取检测框中心点的三维坐标（毫米）"""
     mid_x = (box[0] + box[2]) // 2
     mid_y = (box[1] + box[3]) // 2
     
+    # 坐标边界检查
+    if (mid_x < 0 or mid_x >= intrinsics.width or 
+        mid_y < 0 or mid_y >= intrinsics.height):
+        return None
+        
     depth = depth_frame.get_distance(int(mid_x), int(mid_y))
-    if depth == 0:
+    if depth <= 0.1 or depth > 6.0:  # 过滤无效值和远距离噪声
         return None
     
+    # 使用彩色相机内参反投影
     point_3d = rs.rs2_deproject_pixel_to_point(
-        depth_intrinsics, [mid_x, mid_y], depth
+        intrinsics, [mid_x, mid_y], depth
     )
-    return [round(coord*1000, 1) for coord in point_3d]
+    return [round(coord*1000, 1) for coord in point_3d] #米转毫米
 
-def dectshow(org_img, boxs, depth_frame):
+def dectshow(org_img, boxs, depth_frame, intrinsics):
     """优化后的显示函数"""
     img = org_img.copy()
     for box in boxs:
@@ -38,7 +47,7 @@ def dectshow(org_img, boxs, depth_frame):
                     (int(box[2]), int(box[3])), (0, 255, 0), 2)
         
         # 获取三维坐标
-        coordinates = get_3d_coordinates(box, depth_frame)
+        coordinates = get_3d_coordinates(box, depth_frame, intrinsics)
         if not coordinates:
             continue
             
@@ -73,14 +82,18 @@ if __name__ == "__main__":
     config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 60)
     profile = pipeline.start(config)
     
-    depth_profile = profile.get_stream(rs.stream.depth)
-    depth_intrinsics = depth_profile.as_video_stream_profile().get_intrinsics()
+    # 获取对齐后的彩色相机内参
+    color_profile = profile.get_stream(rs.stream.color)
+    color_intrinsics = color_profile.as_video_stream_profile().get_intrinsics()
 
     try:
         while True:
             frames = pipeline.wait_for_frames()
-            depth_frame = frames.get_depth_frame()
-            color_frame = frames.get_color_frame()
+
+            # 执行深度到彩色图的对齐
+            aligned_frames = align.process(frames)
+            depth_frame = aligned_frames.get_depth_frame()
+            color_frame = aligned_frames.get_color_frame()
             
             if not depth_frame or not color_frame:
                 continue
@@ -92,7 +105,7 @@ if __name__ == "__main__":
             boxes = results[0].boxes.xyxy.cpu().tolist()
 
             # 显示优化后的检测结果
-            dectshow(color_image, boxes, depth_frame)
+            dectshow(color_image, boxes, depth_frame, color_intrinsics)
 
             # 退出控制
             if cv2.waitKey(1) & 0xFF in [ord('q'), 27]:
