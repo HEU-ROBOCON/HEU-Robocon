@@ -1,0 +1,7 @@
+numpy
+opencv_python==4.11.0.86
+ultralytics==8.3.119
+pyrealsense2==2.55.1.6486 # for Intel Realsense D435i
+#pyk4a # for Azure Kinect DK
+
+# 测试环境：python=3.8
