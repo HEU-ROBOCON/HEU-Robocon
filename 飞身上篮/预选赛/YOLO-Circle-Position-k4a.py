@@ -1,7 +1,7 @@
 '''
-文件名：YOLO-Circle-Position.py
+文件名：YOLO-Circle-Position-k4a.py
 功能：使用YOLO进行目标检测，并获取检测框中心点的三维坐标（毫米）
-相机：Azure Kinect DK
+测试使用的相机：Azure Kinect DK
 '''
 import cv2
 import numpy as np
@@ -11,7 +11,7 @@ from ultralytics import YOLO
 import pyk4a
 from pyk4a import Config, PyK4A
 
-model = YOLO('飞身上篮/预选赛/circle_position/weights/yolo11n_cu_cir_2.pt')
+model = YOLO('飞身上篮/预选赛/weights/yolo11n_cu_cir_2.pt')
 
 def get_3d_coordinates(box, depth_image, depth_scale):
     """获取检测框中心点的三维坐标（毫米）"""

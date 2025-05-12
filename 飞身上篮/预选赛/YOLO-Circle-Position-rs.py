@@ -1,6 +1,7 @@
 '''
-文件名：YOLO-Circle-Position.py
+文件名：YOLO-Circle-Position-rs.py
 功能：使用YOLO进行目标检测，并获取检测框中心点的三维坐标（毫米）
+测试使用的相机：Intel RealSense D435i
 '''
 import pyrealsense2 as rs
 import numpy as np
@@ -10,7 +11,7 @@ import torch
 import sys
 from ultralytics import YOLO
 
-model = YOLO('飞身上篮/预选赛/circle_position/weights/yolo11n_cu_cir_2.pt') 
+model = YOLO('飞身上篮/预选赛/weights/yolo11n_cu_cir_2.pt') 
 
 depth_intrinsics = None
 
