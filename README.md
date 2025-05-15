@@ -5,11 +5,14 @@
 ---
 
 ## 目录
+
 - [项目简介](#项目简介)
 
 ---
 
 ## 项目简介
+
 - **目标**：为 Robocon 2025 比赛提供实时视觉处理解决方案。
 - **硬件依赖**：
-  - Intel RealSense D435i 深度摄像头
+  - Intel RealSense D435i 双目深度相机
+  - Azure Kinect DK 深度传感器相机
