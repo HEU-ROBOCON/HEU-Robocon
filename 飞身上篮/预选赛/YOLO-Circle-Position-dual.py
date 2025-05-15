@@ -1,6 +1,7 @@
 '''
-文件名：Dual_Camera_Detection_Unified.py
-功能：单脚本启动Kinect和RealSense双相机检测
+文件名：YOLO-Circle-Position-dual.py
+功能：使用YOLO进行目标检测，并获取检测框中心点的三维坐标（毫米）
+测试使用的相机：Azure Kinect DK和Intel RealSense D435i
 '''
 import cv2
 import multiprocessing as mp
