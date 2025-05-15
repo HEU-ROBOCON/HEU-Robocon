@@ -10,6 +10,7 @@ import pyrealsense2 as rs
 import pyk4a
 from pyk4a import Config, PyK4A
 from ultralytics import YOLO
+import random
 
 def kinect_process():
     """Kinect检测进程"""
@@ -46,7 +47,7 @@ def kinect_process():
                 mid_y = int((box[1]+box[3])//2)
                 
                 # 坐标转换
-                depth = depth_img[mid_y, mid_x]
+                depth = get_average_depth_kinect(depth_img, mid_x, mid_y)
                 if depth == 0: continue
                 x = (mid_x - 640) * depth / 1000  # 1280x720分辨率
                 y = (mid_y - 360) * depth / 1000
@@ -106,7 +107,7 @@ def realsense_process():
                 mid_y = int((box[1]+box[3])//2)
                 
                 # 坐标转换
-                depth = depth_frame.get_distance(mid_x, mid_y)
+                depth = get_average_depth_realsense(depth_frame, mid_x, mid_y)
                 if depth < 0.1 or depth > 4.0: continue
                 point_3d = rs.rs2_deproject_pixel_to_point(intrinsics, [mid_x, mid_y], depth)
                 x, y, z = [coord*1000 for coord in point_3d]
@@ -126,6 +127,54 @@ def realsense_process():
     finally:
         pipeline.stop()
         cv2.destroyAllWindows()
+
+def get_average_depth_kinect(depth_img, center_x, center_y, sample_radius=3, sample_points=9):
+    """
+    在中心点周围采样多个点计算平均深度值 (Kinect版本)
+    
+    参数:
+        depth_img: 深度图像
+        center_x, center_y: 中心点坐标
+        sample_radius: 采样半径
+        sample_points: 采样点数量
+    """
+    height, width = depth_img.shape
+    depths = []
+    
+    for _ in range(sample_points):
+        # 在圆形区域内随机采样
+        angle = random.uniform(0, 2 * np.pi)
+        r = random.uniform(0, sample_radius)
+        x = int(center_x + r * np.cos(angle))
+        y = int(center_y + r * np.sin(angle))
+        
+        # 确保采样点在图像范围内
+        x = max(0, min(x, width - 1))
+        y = max(0, min(y, height - 1))
+        
+        depth = depth_img[y, x]
+        if depth > 0:  # 只计入有效深度值
+            depths.append(depth)
+    
+    return np.mean(depths) if depths else 0
+
+def get_average_depth_realsense(depth_frame, center_x, center_y, sample_radius=3, sample_points=9):
+    """
+    在中心点周围采样多个点计算平均深度值 (RealSense版本)
+    """
+    depths = []
+    
+    for _ in range(sample_points):
+        angle = random.uniform(0, 2 * np.pi)
+        r = random.uniform(0, sample_radius)
+        x = int(center_x + r * np.cos(angle))
+        y = int(center_y + r * np.sin(angle))
+        
+        depth = depth_frame.get_distance(x, y)
+        if 0.1 < depth < 4.0:  # RealSense的有效深度范围
+            depths.append(depth)
+    
+    return np.mean(depths) if depths else 0
 
 if __name__ == '__main__':
     # 创建并启动进程
