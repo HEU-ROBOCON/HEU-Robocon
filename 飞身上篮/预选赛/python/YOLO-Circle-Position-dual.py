@@ -15,7 +15,7 @@ import random
 def kinect_process():
     """Kinect检测进程"""
     # 独立模型实例
-    model = YOLO('飞身上篮/预选赛/weights/yolo11n_cu_cir_2.pt', verbose=False)
+    model = YOLO('飞身上篮/预选赛/python/weights/yolo11n_cu_cir_2.pt', verbose=False)
     
     # Kinect初始化
     k4a = PyK4A(Config(

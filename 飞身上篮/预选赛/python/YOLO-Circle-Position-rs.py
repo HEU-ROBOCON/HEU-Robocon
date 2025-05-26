@@ -11,7 +11,7 @@ import torch
 import sys
 from ultralytics import YOLO
 
-model = YOLO('飞身上篮/预选赛/weights/yolo11n_cu_cir_2.pt') 
+model = YOLO('飞身上篮/预选赛/python/weights/yolo11n_cu_cir_2.pt') 
 
 # 新增对齐对象和彩色相机内参
 align_to = rs.stream.color
