@@ -1,3 +1,7 @@
+/*
+文件名：Circle_Position.cpp
+功能：通过颜色和深度图像检测圆形并计算其深度
+*/
 #include <librealsense2/rs.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
