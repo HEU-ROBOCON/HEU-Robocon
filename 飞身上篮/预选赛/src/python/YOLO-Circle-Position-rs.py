@@ -75,7 +75,11 @@ def get_3d_coordinates(box, depth_frame, intrinsics, sample_radius=3, sample_poi
         intrinsics, [mid_x, mid_y], avg_depth
     )
 
+    # float64类型
     return [round(coord*1000, 1) for coord in point_3d] #米转毫米
+
+    # 将返回值转换为float32类型的numpy数组
+    # return np.array([coord*1000 for coord in point_3d], dtype=np.float32)
 
 def dectshow(org_img, boxs, depth_frame, intrinsics):
     """
@@ -97,10 +101,17 @@ def dectshow(org_img, boxs, depth_frame, intrinsics):
         
         # 获取三维坐标
         coordinates = get_3d_coordinates(box, depth_frame, intrinsics)
+
+        # float64类型
         if not coordinates:
             continue
-            
+        # float32类型
+        # if coordinates is None:
+        #     continue
+        
         x, y, z = coordinates
+        # 显示时转换为字符串，保留一位小数，float32类型
+        # text = [f"X:{x:.1f}mm", f"Y:{y:.1f}mm", f"Z:{z:.1f}mm"]
         text = [f"X:{x}mm", f"Y:{y}mm", f"Z:{z}mm"]
 
         # 文本显示参数
