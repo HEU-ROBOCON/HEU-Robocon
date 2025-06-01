@@ -1,0 +1,35 @@
+<launch>
+
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+      <arg name="align_depth"         value="true"/>        
+      <arg name="enable_sync"         value="true"/>        
+      <arg name="color_width"         value="640"/>
+      <arg name="color_height"        value="480"/>
+      <arg name="depth_width"         value="640"/>
+      <arg name="depth_height"        value="480"/>
+      <arg name="infra_width"         value="640"/>
+      <arg name="infra_height"        value="480"/>
+      <arg name="color_fps"           value="30"/>          
+      <arg name="depth_fps"           value="30"/>          
+      <arg name="infra_fps"           value="30"/>          
+      <arg name="enable_gyro"         value="false"/>       
+      <arg name="enable_accel"        value="false"/>       
+      <arg name="enable_pointcloud"   value="false"/>       
+      <arg name="enable_infra1"       value="true"/>       
+      <arg name="enable_infra2"       value="true"/>       
+      <arg name="allow_no_texture_points" value="true"/>
+  </include>
+
+  <node pkg="yolo_realsense_kinect" type="yolo_realsense_node" name="yolo_realsense_node" output="screen">
+      <param name="engine_name" value="$(find yolo_realsense_kinect)/weights/circle_yolo11n-8.3.0.1.engine"/> 
+      <param name="cuda_post_process" value="g"/>
+
+      <param name="conf_thresh" value="0.5"/>
+      <param name="nms_thresh" value="0.45"/>
+
+      <param name="color_topic" value="/camera/color/image_raw"/>
+      <param name="depth_topic" value="/camera/aligned_depth_to_color/image_raw"/>
+      <param name="info_topic"  value="/camera/color/camera_info"/>
+  </node>
+
+  </launch>

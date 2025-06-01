@@ -1,0 +1,20 @@
+<launch>
+  <include file="$(find azure_kinect_ros_driver)/launch/azure_kinect_driver.launch">
+    <arg name="color_resolution" value="720P"/>
+    <arg name="depth_mode"       value="NFOV_UNBINNED"/>
+    <arg name="camera_fps"       value="30"/>
+  </include>
+
+  <node pkg="yolo_realsense_kinect" type="yolo_kinect_node" name="yolo_kinect_node" output="screen">
+      <param name="engine_name" value="$(find yolo_realsense_kinect)/weights/hoop_net_yolo11n_best1.engine"/> 
+      <param name="cuda_post_process" value="g"/>
+
+      <param name="conf_thresh" value="0.5"/>
+      <param name="nms_thresh" value="0.45"/>
+
+      <param name="color_topic" value="/k4a/color/image_raw"/>
+      <param name="depth_topic" value="/k4a/aligned_depth_to_color/image_raw"/>
+      <param name="info_topic"  value="/k4a/color/camera_info"/>
+  </node>
+
+  </launch>
