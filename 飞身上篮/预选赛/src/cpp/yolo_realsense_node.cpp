@@ -27,13 +27,13 @@
 #include "utils.h"
 
 // Custom Messages - 自定义消息头文件
-#include "yolo_realsense_kinect/DetectedObject3D.h"
-#include "yolo_realsense_kinect/DetectedObject3DArray.h"
+#include "yolo_realsense_kinect/DetectedObject3D_realsense.h"
+#include "yolo_realsense_kinect/DetectedObject3DArray_realsense.h"
 
 // TensorRT Includes - TensorRT 头文件
 #include "NvInfer.h"
 
-// --- 全局变量和函数声明 (这些在同一头文件或链接库中) ---
+// --- 全局变量和函数声明 (这些在项目目录下的头文件或链接库中) ---
 Logger gLogger; // TensorRT 日志记录器
 using namespace nvinfer1;
 const int kOutputSize = kMaxNumOutputBbox * sizeof(Detection) / sizeof(float) + 1; // 输出大小计算
@@ -287,7 +287,7 @@ private:
                              const cv::Mat& color_image, const cv::Mat& depth_image,
                              const std_msgs::Header& header) {
 
-        yolo_realsense::DetectedObject3DArray detections_msg; // 创建 3D 检测数组消息
+        yolo_realsense_kinect::DetectedObject3DArray_realsense detections_msg; // 创建 3D 检测数组消息
         detections_msg.header = header; // 设置消息头
 
         visualization_msgs::MarkerArray marker_array; // 创建 Rviz 标记数组消息
@@ -327,10 +327,10 @@ private:
                 }
 
                 // --- 2. 填充自定义消息 ---
-                yolo_realsense::DetectedObject3D obj;
+                yolo_realsense_kinect::DetectedObject3D_realsense obj;
                 obj.header = header;
                 obj.id = static_cast<uint32_t>(det.class_id);
-                // **注意**: 应该使用一个标签映射来获取真实的类名
+                // **注意**: 这里应该使用一个标签映射来获取真实的类名
                 obj.class_name = "Class_" + std::to_string(static_cast<int>(det.class_id));
                 obj.confidence = det.conf;
                 obj.bbox_2d.x_offset = r.x;
@@ -346,6 +346,7 @@ private:
                     obj.point_3d.x = std::numeric_limits<double>::quiet_NaN();
                     obj.point_3d.y = std::numeric_limits<double>::quiet_NaN();
                     obj.point_3d.z = std::numeric_limits<double>::quiet_NaN();
+                    // continue; // 跳过当前检测结果，不发布
                 }
                 detections_msg.detections.push_back(obj);
 
@@ -353,7 +354,14 @@ private:
                 cv::rectangle(debug_image, r, cv::Scalar(0, 255, 0), 2);
                 cv::putText(debug_image, obj.class_name + ": " + std::to_string(obj.confidence).substr(0, 4),
                             cv::Point(r.x, r.y - 5), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 1);
-
+                if (valid_depth) {
+                            std::string point_text = "X:" + std::to_string(obj.point_3d.x) + 
+                             " Y:" + std::to_string(obj.point_3d.y) + 
+                             " Z:" + std::to_string(obj.point_3d.z);
+                            cv::putText(debug_image, point_text, cv::Point(r.x, r.y + r.height + 15),
+                            cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 1);
+                                }
+                                
                 // --- 4. 创建 Rviz 可视化标记 (如果 3D 坐标有效) ---
                 if (valid_depth) {
                     // 创建球体标记
@@ -427,7 +435,7 @@ public:
                        &decode_ptr_host_, &decode_ptr_device_, cuda_post_process_); // 准备缓冲区
 
         // --- 设置 ROS 发布器 ---
-        pub_detections_3d_ = nh_.advertise<yolo_realsense::DetectedObject3DArray>("/yolo/realsense/detections_3d", 10);
+        pub_detections_3d_ = nh_.advertise<yolo_realsense_kinect::DetectedObject3DArray_realsense>("/yolo/realsense/detections_3d", 10);
         pub_markers_ = nh_.advertise<visualization_msgs::MarkerArray>("/yolo/realsense/markers", 10);
         pub_debug_image_ = it_.advertise("/yolo/realsense/debug_image", 1);
 
