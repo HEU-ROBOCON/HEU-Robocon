@@ -16,3 +16,4 @@
 - **硬件依赖**：
   - Intel RealSense D435i 双目深度相机
   - Azure Kinect DK 深度传感器相机
+  - LIVOX MID-360 3D激光雷达
