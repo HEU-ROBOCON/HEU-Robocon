@@ -1,0 +1,37 @@
+[Unit]
+Description=Robocon ROS Launch Service
+After=network.target
+
+[Service]
+Type=simple
+User=$CURRENT_USER
+Group=$CURRENT_USER
+
+# 环境变量设置
+Environment=HOME=/home/$CURRENT_USER
+Environment=ROS_ROOT=/opt/ros/noetic/share/ros
+Environment=ROS_PACKAGE_PATH=/opt/ros/noetic/share
+Environment=ROS_MASTER_URI=http://localhost:11311
+Environment=ROS_VERSION=1
+Environment=ROS_PYTHON_VERSION=3
+Environment=ROS_DISTRO=noetic
+Environment=PYTHONPATH=/opt/ros/noetic/lib/python3/dist-packages
+Environment=LD_LIBRARY_PATH=/opt/ros/noetic/lib
+Environment=PATH=/opt/ros/noetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# 工作目录和启动命令
+WorkingDirectory=$WORKING_DIR
+ExecStartPre=/bin/sleep 10
+ExecStartPre=/bin/bash -c '[ -e /dev/ttyUSB0 ] && /bin/chmod 777 /dev/ttyUSB0 || true'
+ExecStart=/bin/bash -c 'source /opt/ros/noetic/setup.bash && source $WORKING_DIR/devel/setup.bash && $WORKING_DIR/launch.sh'
+
+# 重启设置
+Restart=on-failure
+RestartSec=10
+
+# 日志设置
+StandardOutput=append:/var/log/robocon_launch.log
+StandardError=append:/var/log/robocon_launch.log
+
+[Install]
+WantedBy=multi-user.target
