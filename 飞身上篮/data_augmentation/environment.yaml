@@ -1,0 +1,16 @@
+# 使用conda创建环境：
+# conda env create -f environment.yaml
+
+name: data-augmentation
+channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+dependencies:
+  - python=3.8
+  - pip
+  - numpy
+  - tqdm
+  - pip:
+    - albumentations==1.3.1
+    - opencv-python-headless==4.9.0.80
