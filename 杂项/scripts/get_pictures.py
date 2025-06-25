@@ -31,8 +31,8 @@ def get_pictures(camera_id, save_path):
             press = cv2.waitKey(0)  # 等待键盘输入
             if press == ord('s'):  # 如果按下's'键
                 # 保存当前帧为图片文件
-                cv2.imwrite(save_path + "circle" + str(count) + ".jpg", frame)
-                print("circle" + str(count) + ".jpg" + "  saved")  # 打印保存成功信息
+                cv2.imwrite(save_path + "loop" + str(count) + ".jpg", frame)
+                print("loop" + str(count) + ".jpg" + "  saved")  # 打印保存成功信息
                 count += 1  # 图片计数器加1
             elif press == ord('q'):  # 如果按下'q'键
                 break  # 退出循环
