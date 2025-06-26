@@ -106,7 +106,7 @@ def get_augmentation_pipeline(mode='train'):
         # 训练集使用更强的增强
         return A.Compose([
             # 几何变换 - 篮球场专用(更温和)
-            A.HorizontalFlip(p=0.3),  # 降低翻转概率
+            A.HorizontalFlip(p=0.3), 
             A.Rotate(limit=15, p=0.3, border_mode=cv2.BORDER_CONSTANT),  # 减小旋转角度
             A.ShiftScaleRotate(shift_limit=0.03, scale_limit=0.05, rotate_limit=10, p=0.3),  # 减小变换幅度
             A.RandomResizedCrop(height=512, width=512, scale=(0.9, 1.0), ratio=(0.9, 1.1), p=0.3),  # 减小裁剪变化
@@ -138,6 +138,9 @@ def get_augmentation_pipeline(mode='train'):
             
             # 噪声和模糊
             A.GaussianBlur(blur_limit=(1, 1), p=0.1),
+            
+            # 安全增强
+            A.BBoxSafeRandomCrop(erosion_rate=0.2, p=0.5),  # 确保边界框不被裁剪掉
         ], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['labels']))
 
 def augment_dataset(input_img_dir, input_label_dir, output_img_dir, output_label_dir, augmentations_per_image=20, mode='train'):
@@ -176,11 +179,46 @@ def augment_dataset(input_img_dir, input_label_dir, output_img_dir, output_label
                 valid_labels = []
                 img_height, img_width = transformed['image'].shape[:2]
                 
+                # 边界框验证统计
+                valid_count = 0
+                invalid_count = 0
+                invalid_reasons = {}
+                
                 for bbox, label in zip(transformed['bboxes'], transformed['labels']):
-                    # 确保边界框有效
-                    if bbox[0] < bbox[2] and bbox[1] < bbox[3]:
+                    valid = True
+                    reason = []
+                    
+                    # 基本有效性检查
+                    if not (bbox[0] < bbox[2] and bbox[1] < bbox[3]):
+                        valid = False
+                        reason.append("无效坐标")
+                    
+                    # 边界检查
+                    if bbox[0] < 0 or bbox[2] > img_width or bbox[1] < 0 or bbox[3] > img_height:
+                        valid = False
+                        reason.append("超出图像范围")
+                    
+                    # 尺寸检查 (宽松条件)
+                    bbox_width = bbox[2] - bbox[0]
+                    bbox_height = bbox[3] - bbox[1]
+                    if bbox_width < 5 or bbox_height < 5:
+                        valid = False
+                        reason.append("尺寸过小")
+                    
+                    if valid:
                         valid_bboxes.append(bbox)
                         valid_labels.append(label)
+                        valid_count += 1
+                    else:
+                        invalid_count += 1
+                        reason_str = ", ".join(reason)
+                        invalid_reasons[reason_str] = invalid_reasons.get(reason_str, 0) + 1
+                
+                # 打印验证统计
+                if invalid_count > 0:
+                    print(f"边界框验证: 有效 {valid_count}, 无效 {invalid_count}")
+                    for r, count in invalid_reasons.items():
+                        print(f"  - {r}: {count}个")
                 
                 if not valid_bboxes:
                     continue
