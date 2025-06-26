@@ -24,29 +24,54 @@ def merge_datasets(dataset1_path, dataset2_path, output_path):
     # 获取dataset1中最大的文件编号
     max_num = 0
     for f in os.listdir(os.path.join(dataset1_path, 'images')):
-        if f.startswith('loop') and f.endswith('.jpg'):
-            num = int(f[4:-4])
-            if num > max_num:
-                max_num = num
+        if f.lower().endswith(('.jpg', '.png', '.jpeg')):
+            # 支持多种文件名格式
+            base_name = os.path.splitext(f)[0]
+            if base_name.startswith(('loop', 'image')):
+                try:
+                    num = int(''.join(filter(str.isdigit, base_name)))
+                    if num > max_num:
+                        max_num = num
+                except ValueError:
+                    continue
     
     # 复制并重命名dataset2文件
-    print(f"正在合并dataset2，从loop{max_num+1}开始...")
-    for folder in ['images', 'labels']:
-        src_dir = os.path.join(dataset2_path, folder)
-        dst_dir = os.path.join(output_path, folder)
-        
-        for f in os.listdir(src_dir):
-            if f.startswith('loop') and (f.endswith('.jpg') or f.endswith('.txt')):
-                # 提取原始编号
-                orig_num = int(f[4:-4])
-                # 计算新编号
-                new_num = orig_num + max_num + 1
-                # 构建新文件名
-                new_name = f"loop{new_num}{os.path.splitext(f)[1]}"
-                # 复制文件
+    print(f"正在合并dataset2，从{max_num+1}开始...")
+    
+    # 先处理图片文件
+    image_files = []
+    src_image_dir = os.path.join(dataset2_path, 'images')
+    for f in os.listdir(src_image_dir):
+        if f.lower().endswith(('.jpg', '.png', '.jpeg')):
+            base_name, ext = os.path.splitext(f)
+            try:
+                new_num = max_num + 1
+                new_name = f"loop{new_num}{ext}"
+                max_num += 1
+                # 复制图片文件
                 shutil.copy2(
-                    os.path.join(src_dir, f),
-                    os.path.join(dst_dir, new_name))
+                    os.path.join(src_image_dir, f),
+                    os.path.join(output_path, 'images', new_name))
+                image_files.append(base_name)
+            except ValueError:
+                pass
+    
+    # 再处理对应的标签文件
+    src_label_dir = os.path.join(dataset2_path, 'labels')
+    for f in os.listdir(src_label_dir):
+        if f.endswith('.txt'):
+            base_name = os.path.splitext(f)[0]
+            if base_name in image_files:  # 只复制有对应图片的标签
+                try:
+                    # 找到对应的新编号
+                    idx = image_files.index(base_name)
+                    new_name = f"loop{max_num - len(image_files) + idx + 1}.txt"
+                    # 复制标签文件
+                    shutil.copy2(
+                        os.path.join(src_label_dir, f),
+                        os.path.join(output_path, 'labels', new_name))
+                except ValueError:
+                    pass
     
     # 合并classes.txt
     print("合并classes.txt...")
