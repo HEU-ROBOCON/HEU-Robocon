@@ -1,8 +1,8 @@
-### 分步协作开发指南：基于分支管理与 PR 流程
+# 分步协作开发指南：基于分支管理与 PR 流程
 
 ---
 
-#### **一、分支策略规划**
+## **一、分支策略规划**
 
 - **主分支 `master`**：仅存放稳定、可直接用于比赛的代码，禁止直接在此分支开发。
 - **开发分支 `dev`**：用于集成阶段性功能，测试通过后再合并到 `master`。
@@ -10,7 +10,7 @@
 
 ---
 
-#### **二、首次设置分支结构**
+## **二、首次设置分支结构**
 
 1. **初始化主分支**：
 
@@ -18,6 +18,7 @@
    git checkout master  # 确保在 master 分支
    git push origin master  # 推送初始代码到远程
    ```
+
 2. **创建公共开发分支 `dev`**：
 
    ```bash
@@ -27,16 +28,16 @@
 
 ---
 
-#### **三、日常开发流程（以添加新功能为例）**
+## **三、日常开发流程（以添加新功能为例）**
 
-##### **1. 拉取最新代码（每次开发前必做）**
+### **1. 拉取最新代码（每次开发前必做）**
 
 ```bash
 git checkout master   # 切换到主分支
 git pull origin master  # 拉取最新代码
 ```
 
-##### **2. 创建个人分支**
+### **2. 创建个人分支**
 
 ```bash
 git checkout -b feat/add-circle-detection  # 从 master 创建特性分支
@@ -45,7 +46,7 @@ git checkout -b feat/add-circle-detection  # 从 master 创建特性分支
 # - 修复分支: fix/问题描述 (如 fix/color-bug)
 ```
 
-##### **3. 在个人分支开发并提交**
+### **3. 在个人分支开发并提交**
 
 ```bash
 # 修改代码后提交
@@ -54,7 +55,7 @@ git commit -m "feat: 添加红色圆形检测功能"  # 提交信息要清晰
 git push origin feat/add-circle-detection  # 推送分支到远程
 ```
 
-##### **4. 发起 Pull Request (PR)**
+### **4. 发起 Pull Request (PR)**
 
 1. 进入 GitHub 仓库页面，点击 **Pull requests** → **New pull request**。
 2. **选择分支**：
@@ -63,7 +64,7 @@ git push origin feat/add-circle-detection  # 推送分支到远程
 3. 填写 PR 标题和描述（说明修改内容、测试结果等）。
 4. 点击 **Create pull request**，并 @ 其他人审核。
 
-##### **5. 代码审核与合并**
+### **5. 代码审核与合并**
 
 - **审核人**：
   1. 查看代码变更（Files changed 标签页）。
@@ -73,7 +74,7 @@ git push origin feat/add-circle-detection  # 推送分支到远程
   1. 确认审核通过后，点击 **Merge pull request**。
   2. 选择合并方式（推荐 **Squash and merge**，合并为单个提交）。
 
-##### **6. 同步本地仓库**
+### **6. 同步本地仓库**
 
 ```bash
 git checkout master      # 切换回主分支
@@ -83,29 +84,33 @@ git branch -d feat/add-circle-detection  # 删除本地已合并的分支
 
 ---
 
-#### **四、处理合并冲突**
+## **四、处理合并冲突**
 
 若多人修改同一文件导致冲突，按以下步骤解决：
 
 1. 在个人分支执行：
+
    ```bash
    git checkout master
    git pull origin master        # 拉取最新 master
    git checkout feat/your-branch # 切回你的分支
    git merge master              # 合并 master 到当前分支
    ```
+
 2. 手动解决冲突文件中的 `<<<<<<< HEAD` 标记。
 3. 提交解决后的代码：
+
    ```bash
    git add .
    git commit -m "fix: 解决与 master 的冲突"
    git push origin feat/your-branch
    ```
+
 4. PR 页面会自动更新，重新请求审核。
 
 ---
 
-#### **五、关键注意事项**
+## **五、关键注意事项**
 
 1. **禁止直接向 `master` 提交代码**，必须通过 PR 合并。
 2. **分支命名规范**：清晰表明用途（如 `feat/`, `fix/`, `docs/`）。
@@ -116,9 +121,9 @@ git branch -d feat/add-circle-detection  # 删除本地已合并的分支
 
 ---
 
-#### **六、协作流程图**
+## **六、协作流程图**
 
-```
+```mermaid
 [本地开发] → 推送分支 → [GitHub 发起 PR] → [队友审核] → [合并到 master] → [同步本地]
       ↑                                                                  ↓
       └───────────────────── 处理冲突 ←───────────────────────┘
