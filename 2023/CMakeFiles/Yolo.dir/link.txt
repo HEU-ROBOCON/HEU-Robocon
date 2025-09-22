@@ -1,0 +1,2 @@
+/usr/bin/ar qc libYolo.a  CMakeFiles/Yolo.dir/Yolo/yolov5.cpp.o
+/usr/bin/ranlib libYolo.a
