@@ -1,0 +1,1 @@
+需要结合[**tenserrtx**](https://github.com/wang-xinyu/tensorrtx.git)项目运行该ros包。缺少必要的include和src文件。

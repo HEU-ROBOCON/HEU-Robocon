@@ -1,0 +1,49 @@
+<launch>
+    <arg name="open_serial" default="true" />
+    <arg name="port" default="/dev/ttyUSB0" />
+    <arg name="baud_rate" default="115200" />
+    <arg name="base_link_pub" default="/robot_pose_in_world" />
+    <arg name="kinect_loop_pub" default="/kinect/loop/targets_in_world" />
+    <arg name="kinect_circle_pub" default="/kinect/circle/targets_in_world" />
+    
+    <include file="$(find fast_livo)/launch/mapping_mid360_my.launch" />
+    <include file="$(find yolo_realsense_kinect)/launch/yolo_realsense_kinect.launch" />
+    <include file="$(find tf_transformer)/launch/transformer.launch" />
+    
+    <group if="$(arg open_serial)" >
+    <node pkg="serial_sender" type="serial_kinect_lidar" name="serial_kinect_lidar" output="screen">
+        <param name="port" value="$(arg port)" />
+        <param name="baud_rate" value="$(arg baud_rate)" />
+        <param name="base_link_pub" value="$(arg base_link_pub)" />
+        <param name="kinect_loop_pub" value="$(arg kinect_loop_pub)" />
+        <param name="kinect_circle_pub" value="$(arg kinect_circle_pub)" />
+        <param name="en_kinect_loop" value="true" />
+        <param name="en_kinect_circle" value="true" />
+        <param name="en_base_link" value="true" />
+        <param name="arrive_circle_point_distance_y" value="0.55" />
+        <param name="arrive_circle_point_distance_threshold" value="0.6" />
+        <param name="arrive_circle_point_x_threshold" value="0.1" />
+        <param name="arrive_circle_point_y_threshold" value="0.1" />
+        <param name="similar_circle_point_x_threshold" value="0.1" />
+        <param name="similar_circle_point_y_threshold" value="0.1" />
+        <param name="world_frame_id" value="world" />
+        <param name="x_same_direction" value="true" />
+        <param name="y_same_direction" value="false" />
+        <param name="margin" value="0.4" />
+        <param name="changdi_kuan" value="8.0" />
+        <param name="changdi_chang_zhu" value="15.0" />
+        <param name="changdi_chang_tiao" value="6.0" />
+        <param name="kuan_equal_x" value="true" />
+        <param name="whether_zhu" value="false" />
+        <!-- <param name="frequency_count" value="3" /> -->
+        <param name="threshold_to_rectify" value="5" />
+        <param name="threshold_to_arrive" value="5" />
+        <param name="delay_time" value="0.04" />
+        <param name="debug_mode" value="true" />
+        <param name="count" value="3" />
+        <param name="lidar_init_count" value="50" />
+    </node>
+    </group>
+
+
+</launch>

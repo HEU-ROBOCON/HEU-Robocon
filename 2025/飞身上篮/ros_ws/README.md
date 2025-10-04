@@ -10,6 +10,8 @@
 4. ROS环境加载：`source ./devel/setup.bash`
 5. ROS节点启动：`roslaunch serial_sender serial_sender.launch`
 
+注意：需要clone其他所需开源项目补全src/，以及安装必要的硬件驱动库才能运行本项目。
+
 ## 自动启动设置
 
 系统启动时将自动运行上述功能，配置方法如下：
