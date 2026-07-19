@@ -1,0 +1,40 @@
+build/
+cmake-build-*/
+Debug/
+Release/
+xcode/
+pic/
+# 编译中间文件
+*.o
+*.obj
+*.pch
+*.ilk
+*.pdb
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.exe
+*.out
+*.app
+
+# CMake生成的文件
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+compile_commands.json
+
+# IDE和编辑器临时文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 其他
+.DS_Store
+Thumbs.db
+EOF
