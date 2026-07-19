@@ -1,0 +1,1 @@
+/usr/bin/c++  -pthread -rdynamic CMakeFiles/multi_lidars_upgrade.dir/main.cpp.o -o multi_lidars_upgrade  -llivox_lidar_sdk_static 

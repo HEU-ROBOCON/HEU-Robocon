@@ -1,0 +1,50 @@
+/**:
+    ros__parameters:
+        feature_extract_enable: false
+        point_filter_num: 1
+        max_iteration: 3
+        filter_size_surf: 0.05
+        filter_size_map: 0.05
+        cube_side_length: 1000.0
+        runtime_pos_log_enable: false
+        map_file_path: "./bisai.pcd"
+
+        common:
+            lid_topic:  "/lidar_points"
+            imu_topic:  "/imu"
+            time_sync_en: true         
+            time_offset_lidar_to_imu: 0.0 
+
+        preprocess:
+            lidar_type: 4          
+            scan_line:  96
+            timestamp_unit: 3
+            scan_rate: 20
+            blind: 0.7
+
+        mapping:
+            acc_cov: 0.1
+            gyr_cov: 0.1
+            b_acc_cov: 0.0001
+            b_gyr_cov: 0.0001
+            fov_degree:    360.0
+            det_range:     89.5
+            extrinsic_est_en:  false      # 既然已经有了准确的 TF，建议设为 false 以保持稳定
+            # 根据 Translation 数据修改：[x, y, z]
+            extrinsic_T: [0.265, 0.073, 0.156]
+            # 根据 Matrix 数据修改（前三行前三列）：
+            extrinsic_R: [ -1.000, -0.023, -0.003, 
+                           -0.023,  1.000,  0.001, 
+                            0.003,  0.001, -1.000 ]
+
+        publish:
+            path_en: true        
+            effect_map_en: false   
+            map_en: true        
+            scan_publish_en:  true       
+            dense_publish_en: false      
+            scan_bodyframe_pub_en: true  
+
+        pcd_save:
+            pcd_save_en: true
+            interval: -1                 
